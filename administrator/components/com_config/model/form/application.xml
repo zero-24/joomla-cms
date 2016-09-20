@@ -12,8 +12,8 @@
 			filter="integer"
 			>
 			<option value="0">COM_CONFIG_FIELD_VALUE_CACHE_OFF</option>
-			<option value="2">COM_CONFIG_FIELD_VALUE_CACHE_PROGRESSIVE</option>
 			<option value="1">COM_CONFIG_FIELD_VALUE_CACHE_CONSERVATIVE</option>
+			<option value="2">COM_CONFIG_FIELD_VALUE_CACHE_PROGRESSIVE</option>
 		</field>
 
 		<field
