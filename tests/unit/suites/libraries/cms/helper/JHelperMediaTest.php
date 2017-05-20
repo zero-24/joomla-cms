@@ -162,7 +162,6 @@ class JHelperMediaTest extends TestCaseDatabase
 			array('PDF file wich work' => array('name' => 'JoomlaCoC.pdf', 'type' => 'application/pdf', 'tmp_name' => JPATH_TESTS . '/suites/libraries/cms/helper/stubs/JoomlaCoC.pdf', 'error' => 0, 'size' => 335872), true),
 			array('PDF file mime check fails' => array('name' => 'JoomlaCoC.pdf', 'type' => 'image/jpeg', 'tmp_name' => JPATH_TESTS . '/suites/libraries/cms/helper/stubs/JoomlaCoC.pdf', 'error' => 0, 'size' => 335872), false),
 			array('PDF file mime check fails' => array('name' => 'JoomlaCoC.jpg', 'type' => 'image/jpeg', 'tmp_name' => JPATH_TESTS . '/suites/libraries/cms/helper/stubs/JoomlaCoC.pdf', 'error' => 0, 'size' => 335872), false),
-
 			);
 	}
 
