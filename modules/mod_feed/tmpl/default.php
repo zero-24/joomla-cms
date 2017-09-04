@@ -26,7 +26,7 @@ defined('_JEXEC') or die;
 		<?php $direction = 'redirect-rtl'; ?>
 	<?php elseif ($myrtl == 0) : ?>
 		<?php $direction = 'redirect-ltr'; ?>
-	<?php elseif ($myrtl == 1): ?>
+	<?php elseif ($myrtl == 1) : ?>
 		<?php $direction = 'redirect-ltr'; ?>
 	<?php elseif ($myrtl == 2) : ?>
 		<?php $direction = 'redirect-rtl'; ?>
