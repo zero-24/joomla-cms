@@ -56,7 +56,7 @@ defined('_JEXEC') or die;
 			<?php if (!empty($feed)) : ?>
 				<ul class="newsfeed<?php echo $params->get('moduleclass_sfx'); ?>">
 					<?php for ($i = 0, $max = min(count($feed), $params->get('rssitems', 5)); $i < $max; $i++) : ?>
-						<?php $uri   = !empty($feed[$i]->uri) || $feed[$i]->uri !== null ? trim($feed[$i]->uri) : trim($feed[$i]->guid); ?>
+						<?php $uri   = (!empty($feed[$i]->uri) || $feed[$i]->uri !== null) ? trim($feed[$i]->uri) : trim($feed[$i]->guid); ?>
 						<?php $uri   = strpos($uri, 'http') !== 0 ? $params->get('rsslink') : $uri; ?>
 						<?php $text  = !empty($feed[$i]->content) || $feed[$i]->content !== null ? trim($feed[$i]->content) : trim($feed[$i]->description); ?>
 						<?php $title = trim($feed[$i]->title); ?>
