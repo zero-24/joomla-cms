@@ -167,7 +167,7 @@ class JFormFieldConsentBox extends JFormFieldCheckboxes
 	 *
 	 * @return  string  A string containing the html for the control group
 	 *
-	 * @since   3.2
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function renderField($options = array())
 	{
