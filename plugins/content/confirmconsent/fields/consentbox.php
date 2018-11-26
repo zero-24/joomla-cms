@@ -231,7 +231,7 @@ class JFormFieldConsentBox extends JFormFieldCheckboxes
 			// Something at the database layer went wrong
 			return Route::_(
 				'index.php?option=com_content&view=article&id='
-				. $articleId . '&tmpl=component'
+				. $this->articleid . '&tmpl=component'
 			);
 		}
 
