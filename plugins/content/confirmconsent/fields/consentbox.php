@@ -43,7 +43,7 @@ class JFormFieldConsentBox extends JFormFieldCheckboxes
 	/**
 	 * The article ID.
 	 *
-	 * @var    string
+	 * @var    integer
 	 * @since  __DEPLOY_VERSION__
 	 */
 	protected $articleid;
