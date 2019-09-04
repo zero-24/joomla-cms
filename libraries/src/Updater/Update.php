@@ -380,7 +380,7 @@ class Update extends \JObject
 						if ($dbType === 'mysql')
 						{
 							// Check whether we have a MariaDB version string and extract the proper version from it
-							if (stripos($version, 'mariadb') !== false)
+							if (stripos($dbVersion, 'mariadb') !== false)
 							{
 								// MariaDB: Strip off any leading '5.5.5-', if present
 								$dbVersion = preg_replace('/^5\.5\.5-/', '', $dbVersion);
