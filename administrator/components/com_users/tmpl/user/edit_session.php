@@ -31,7 +31,7 @@ Text::script('JLIB_JS_AJAX_ERROR_TIMEOUT');
 ?>
 
 <?php if (($this->item->id !== 0) && (Factory::getUser()->id === $this->item->id) || Factory::getUser()->authorise('core.admin')) : ?>
-	<?php HTMLHelper::script('com_users/sessionend.js', ['version' => 'auto', 'relative' => true]); ?>
+	<?php HTMLHelper::script('com_users/admin-users-endsession.js', ['version' => 'auto', 'relative' => true]); ?>
 	<?php Factory::getDocument()->addScriptOptions(
 		'js-users-endsession',
 		array(
