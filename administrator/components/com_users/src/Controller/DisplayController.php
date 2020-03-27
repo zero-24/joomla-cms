@@ -15,6 +15,7 @@ use Joomla\CMS\Access\Exception\Notallowed;
 use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\Response\JsonResponse;
 use Joomla\CMS\Router\Route;
 
 /**
@@ -118,5 +119,36 @@ class DisplayController extends BaseController
 		}
 
 		return parent::display($cachable, $urlparams);
+	}
+
+ 	/**
+	 * Method to terminate an existing user's session.
+	 *
+	 * @return  void  True if the record can be added, an error object if not.
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	public function endSession()
+	{
+		$userId             = (int) $this->input->getInt('user_id');
+		$keepCurrentSession = (boolean) $this->input->get('keep_current_session', true);
+		$data               = [];
+
+		// Make sure I can only do this when it is my own accout or I'm Superuser
+		if (($userId !== 0) && ($this->app->getIdentity()->id === $userId) || $this->app->getIdentity()->authorise('core.admin'))
+		{
+			$model = $this->getModel('User', 'Administrator', ['ignore_request' => true]);
+
+			if ($model->destroyUsersSessions($userId, $keepCurrentSession))
+			{
+				$data['success'] = Text::_('COM_USERS_LOGGED_OUT_SUCCESS');
+			}
+			else
+			{
+				$data['error'] = Text::_('COM_USERS_ERROR_INVALID_USER');
+			}
+		}
+
+		echo new JsonResponse($data);
 	}
 }

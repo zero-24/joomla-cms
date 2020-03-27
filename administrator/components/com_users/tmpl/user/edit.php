@@ -30,17 +30,15 @@ $this->useCoreUI = true;
 ?>
 
 <form action="<?php echo Route::_('index.php?option=com_users&layout=edit&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="user-form" enctype="multipart/form-data" class="form-validate">
-
 	<h2><?php echo $this->form->getValue('name'); ?></h2>
-
 	<?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', array('active' => 'details')); ?>
-
 		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'details', Text::_('COM_USERS_USER_ACCOUNT_DETAILS')); ?>
 			<div class="card">
 				<div class="card-body">
 					<div class="row">
 						<div class="col-lg-8 col-xl-6">
-						<?php echo $this->form->renderFieldset('user_details'); ?>
+							<?php echo $this->form->renderFieldset('user_details'); ?>
+							<?php echo $this->loadTemplate('session'); ?>
 						</div>
 					</div>
 				</div>
@@ -51,7 +49,7 @@ $this->useCoreUI = true;
 				<fieldset id="fieldset-groups" class="options-form">
 					<legend><?php echo Text::_('COM_USERS_ASSIGNED_GROUPS'); ?></legend>
 					<div>
-					<?php echo $this->loadTemplate('groups'); ?>
+						<?php echo $this->loadTemplate('groups'); ?>
 					</div>
 				</fieldset>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>

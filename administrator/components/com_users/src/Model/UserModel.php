@@ -1401,4 +1401,38 @@ class UserModel extends AdminModel
 
 		return $check;
 	}
+
+	/**
+	 * Destroys all the sessions associated with a given user.
+	 *
+	 * @param   integer  $userId              The user's id
+	 * @param   boolean  $keepCurrentSession  Keep the current session alive when possible
+	 *
+	 * @return  boolean  True on success, false on failure.
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	public function destroyUsersSessions($userId, $keepCurrentSession = true)
+	{
+		$db = $this->getDbo();
+		$query = $db->getQuery(true)
+			->select('session_id')
+			->from($db->quoteName('#__session'))
+			->where($db->quoteName('userid') . ' = ' . (int) $userId);
+		$db->setQuery($query);
+
+		$sessionIds = $db->loadColumn();
+		$currentSessionId = JFactory::getSession()->getId();
+
+		foreach ($sessionIds as $sessionId)
+		{
+			if ($keepCurrentSession === true && $currentSessionId === $sessionId)
+			{
+				continue;
+			}
+
+			// Run the destroy step for the session storage ID.
+			JSessionStorage::getInstance()->destroy($sessionId);
+		}
+	}
 }
