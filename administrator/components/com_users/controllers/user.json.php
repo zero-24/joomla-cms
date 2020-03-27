@@ -3,16 +3,20 @@
  * @package     Joomla.Administrator
  * @subpackage  com_users
  *
- * @copyright   Copyright (C) 2005 - 2016 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Response\JsonResponse;
+
 /**
  * User controller class.
  *
- * @since  1.6
+ * @since  __DEPLOY_VERSION__
  */
 class UsersControllerUser extends JControllerForm
 {
@@ -21,27 +25,24 @@ class UsersControllerUser extends JControllerForm
 	 *
 	 * @return  void  True if the record can be added, an error object if not.
 	 *
-	 * @since   3.6
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function endSession()
 	{
-		$userId = $this->input->getInt('user_id');
+		$userId = (int) $this->input->getInt('user_id');
 		$data   = array();
 
-		if ($userId !== 0)
+		// Make sure I can only do this when it is my own accout or I'm Superuser
+		if (($userId !== 0) && (Factory::getUser()->id === $userId) || Factory::getUser()->authorise('core.admin'))
 		{
-			/** @var UsersModelUser $model */
 			$model = $this->getModel('User');
 			$model->destroyUsersSessions($userId);
-			$data['success'] = JText::_('COM_USERS_LOGGED_OUT_SUCCESS');
-		}
-		else
-		{
-			$data['error'] = JText::_('COM_MESSAGES_ERR_INVALID_USER');
+			$data['success'] = Text::_('COM_USERS_LOGGED_OUT_SUCCESS');
 		}
 
+		$data['error'] = Text::_('COM_MESSAGES_ERR_INVALID_USER');
 
-		echo new JResponseJson($data);
+		echo new JsonResponse($data);
 		jexit();
 	}
 
