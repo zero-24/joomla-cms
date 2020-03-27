@@ -15,19 +15,6 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Uri\Uri;
 
-
-// Load JavaScript message titles
-Text::script('ERROR');
-Text::script('WARNING');
-Text::script('NOTICE');
-Text::script('MESSAGE');
-
-// Add strings for JavaScript error translations.
-Text::script('JLIB_JS_AJAX_ERROR_CONNECTION_ABORT');
-Text::script('JLIB_JS_AJAX_ERROR_NO_CONTENT');
-Text::script('JLIB_JS_AJAX_ERROR_OTHER');
-Text::script('JLIB_JS_AJAX_ERROR_PARSE');
-Text::script('JLIB_JS_AJAX_ERROR_TIMEOUT');
 ?>
 
 <?php if (($this->item->id !== 0) && (Factory::getUser()->id === $this->item->id) || Factory::getUser()->authorise('core.admin')) : ?>
