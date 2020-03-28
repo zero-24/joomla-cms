@@ -11,6 +11,7 @@ defined('_JEXEC') or die;
 
 use Id4me\RP\Model\ClaimRequest;
 use Id4me\RP\Model\ClaimRequestList;
+use Id4me\RP\Model\Client;
 use Id4me\RP\Model\OpenIdConfig;
 use Id4me\RP\Model\UserInfo;
 use Id4me\RP\Service;
@@ -69,6 +70,14 @@ class PlgSystemId4me extends CMSPlugin
 	protected static $id4me;
 
 	/**
+	 * The supported form contexts
+	 *
+	 * @var type
+	 * @since  __DEPLOY_VERSION__
+	 */
+	private $supportedContext = ['com_admin.profile', 'com_users.user', 'com_users.profile', 'com_users.registration'];
+
+	/**
 	 * The redirect URL for the login`
 	 *
 	 * @var    string
@@ -98,7 +107,7 @@ class PlgSystemId4me extends CMSPlugin
 	 * @var     boolean|null
 	 * @since   __DEPLOY_VERSION__
 	 */
-	protected $allowButtonDisplay = null;
+	private $allowButtonDisplay = null;
 
 	/**
 	 * Have I already injected CSS and JavaScript? Prevents double inclusion of the same files.
@@ -282,13 +291,8 @@ class PlgSystemId4me extends CMSPlugin
 		$wa->useStyle('plg_system_id4me.button');
 		$wa->useScript('plg_system_id4me.login');
 
-		// Load language strings client-side
-		Text::script('PLG_SYSTEM_WEBAUTHN_ERR_CANNOT_FIND_USERNAME');
-		Text::script('PLG_SYSTEM_WEBAUTHN_ERR_EMPTY_USERNAME');
-		Text::script('PLG_SYSTEM_WEBAUTHN_ERR_INVALID_USERNAME');
-
 		// Store the current URL as the default return URL after login (or failure)
-		Joomla::setSessionVar('returnUrl', Uri::current(), 'plg_system_webauthn');
+		Factory::getApplication()->getSession()->set('returnUrl', Uri::current());
 	}
 
 
@@ -301,7 +305,7 @@ class PlgSystemId4me extends CMSPlugin
 	 */
 	public function onBeforeRender(): void
 	{
-		$allowedLoginClient = (string) $this->params->get('allowed_login_client', 'site');
+/*		$allowedLoginClient = (string) $this->params->get('allowed_login_client', 'site');
 
 		// For now we hardcode site as only solution that is working
 		$allowedLoginClient = 'site';
@@ -316,7 +320,7 @@ class PlgSystemId4me extends CMSPlugin
 			// Load the layout with the JavaScript and CSS
 			require PluginHelper::getLayoutPath('system', 'id4me', 'login');
 			return;
-		}
+		}*/
 
 		if (in_array($this->app->input->get('option'), ['com_users', 'com_admin'])
 			&& in_array($this->app->input->get('view'), ['profile', 'user'])
@@ -324,7 +328,6 @@ class PlgSystemId4me extends CMSPlugin
 		{
 			// Load the layout with the JavaScript and CSS
 			require PluginHelper::getLayoutPath('system', 'id4me', 'profile');
-			return;
 		}
 	}
 
@@ -338,7 +341,7 @@ class PlgSystemId4me extends CMSPlugin
 	 *
 	 * @since   __DEPLOY_VERSION__
 	 */
-	public function getID4MEClient(OpenIdConfig $openIdConfig, $login = false)
+	public function getID4MEClient(OpenIdConfig $openIdConfig, $login = false): Client
 	{
 		return $this->ID4MeHandler()->register($openIdConfig, $this->app->get('sitename'), $this->getValidateUrl($login), 'web');
 	}
@@ -346,13 +349,13 @@ class PlgSystemId4me extends CMSPlugin
 	/**
 	 * Get a cached version from the client, if available
 	 *
-	 * @param   type $authorityName  The authority as ID
-	 * @param   OpenIdConfig $openIdConfig
-	 * @param   type $login
+	 * @param   string        $authorityName  The authority as ID
+	 * @param   OpenIdConfig  $openIdConfig   The openIdConfig object
+	 * @param   boolean       $login          Is the ID logged in
 	 *
 	 * @return  \Id4me\RP\Model\Client
 	 */
-	protected function getCachedID4MeClient($authorityName, OpenIdConfig $openIdConfig, $login = false)
+	protected function getCachedID4MeClient($authorityName, OpenIdConfig $openIdConfig, $login = false): Client
 	{
 		$options = [
 			// One month
@@ -418,17 +421,15 @@ class PlgSystemId4me extends CMSPlugin
 		$this->app->setUserState('id4me.client', $requestedLoginClient);
 
 		$authorityName = $this->ID4MeHandler()->discover($identifier);
-
-		$openIdConfig = $this->ID4MeHandler()->getOpenIdConfig($authorityName);
-
-		$client = $this->getCachedID4MeClient($authorityName, $openIdConfig, true);
+		$openIdConfig  = $this->ID4MeHandler()->getOpenIdConfig($authorityName);
+		$client        = $this->getCachedID4MeClient($authorityName, $openIdConfig, true);
 
 		if ($client === false)
 		{
 			return false;
 		}
 
-		$state        = UserHelper::genRandomPassword(100);
+		$state = UserHelper::genRandomPassword(100);
 
 		$this->app->setUserState('id4me.clientInfo', (object) $client);
 		$this->app->setUserState('id4me.openIdConfig', $openIdConfig);
@@ -440,17 +441,19 @@ class PlgSystemId4me extends CMSPlugin
 		if (empty($joomlaUser->id))
 		{
 			$claims = new ClaimRequestList(
-                new ClaimRequest('given_name', true),
-                new ClaimRequest('family_name', true),
-                new ClaimRequest('name', true),
-                new ClaimRequest('email', true)
-            );
+				new ClaimRequest('given_name', true),
+				new ClaimRequest('family_name', true),
+				new ClaimRequest('name', true),
+				new ClaimRequest('email', true)
+			);
 		}
 
-        $authorizationUrl = $this->ID4MeHandler()->getAuthorizationUrl($openIdConfig,
+		$authorizationUrl = $this->ID4MeHandler()->getAuthorizationUrl($openIdConfig,
 				$client->getClientId(), $identifier, $client->getActiveRedirectUri(),
-				$state, null, $claims
-        );
+				$state,
+				null,
+				$claims
+		);
 
 		if (!$authorizationUrl)
 		{
@@ -475,10 +478,8 @@ class PlgSystemId4me extends CMSPlugin
 		$this->app->setUserState('id4me.identifier', $identifier);
 
 		$authorityName = $this->ID4MeHandler()->discover($identifier);
-
-		$openIdConfig = $this->ID4MeHandler()->getOpenIdConfig($authorityName);
-
-		$client = $this->getCachedID4MeClient($authorityName, $openIdConfig);
+		$openIdConfig  = $this->ID4MeHandler()->getOpenIdConfig($authorityName);
+		$client        = $this->getCachedID4MeClient($authorityName, $openIdConfig);
 
 		if ($client === false)
 		{
@@ -491,7 +492,7 @@ class PlgSystemId4me extends CMSPlugin
 		$this->app->setUserState('id4me.openIdConfig', $openIdConfig);
 		$this->app->setUserState('id4me.state', $state);
 
-        $authorizationUrl = $this->ID4MeHandler()->getAuthorizationUrl($openIdConfig, $client->getClientId(), $identifier, $client->getActiveRedirectUri(), $state);
+		$authorizationUrl = $this->ID4MeHandler()->getAuthorizationUrl($openIdConfig, $client->getClientId(), $identifier, $client->getActiveRedirectUri(), $state);
 
 		if (!$authorizationUrl)
 		{
@@ -512,26 +513,23 @@ class PlgSystemId4me extends CMSPlugin
 	 */
 	public function onAjaxID4MeLogin()
 	{
-		$code = $this->app->input->get('code');
+		$code  = $this->app->input->get('code');
 		$state = $this->app->input->get('state');
 
-		$isAdmin = $this->app->getUserState('id4me.client') === 'administrator';
-
-		$client = $this->app->getUserState('id4me.clientInfo');
+		$isAdmin      = $this->app->getUserState('id4me.client') === 'administrator';
+		$client       = $this->app->getUserState('id4me.clientInfo');
 		$openIdConfig = $this->app->getUserState('id4me.openIdConfig');
-		$identifier = $this->app->getUserState('id4me.identifier');
+		$identifier   = $this->app->getUserState('id4me.identifier');
 
 		// Prevent __PHP_Incomplete_Class
-		$client = unserialize(serialize($client));
+		$client       = unserialize(serialize($client));
 		$openIdConfig = unserialize(serialize($openIdConfig));
 
 		$authorizedAccessTokens = $this->ID4MeHandler()->getAuthorizationTokens($openIdConfig, $code, $client);
-
-		$decodedToken = $authorizedAccessTokens->getIdTokenDecoded();
+		$decodedToken           = $authorizedAccessTokens->getIdTokenDecoded();
 
 		$joomlaUser = $this->getUserByIdentifier();
-
-		$home = $this->app->getMenu()->getDefault();
+		$home       = $this->app->getMenu()->getDefault();
 
 		if (!($joomlaUser instanceof User) || $state != $this->app->getUserState('id4me.state') || $decodedToken->getId4meIdentifier() != $identifier)
 		{
@@ -574,8 +572,8 @@ class PlgSystemId4me extends CMSPlugin
 
 			if ($isAdmin)
 			{
-				$options['action']       = 'core.login.admin';
-				$options['group']        = 'Public Backend';
+				$options['action'] = 'core.login.admin';
+				$options['group']  = 'Public Backend';
 
 				// Router is broken for subfolders, so we have to create the path manually
 				$options['redirect_url'] = rtrim(Uri::base(true), '/') . '/administrator/index.php?option=com_cpanel';
@@ -593,7 +591,7 @@ class PlgSystemId4me extends CMSPlugin
 			 */
 			if (in_array(false, $results, true) == false)
 			{
-				$options['user'] = Factory::getUser();
+				$options['user']         = Factory::getUser();
 				$options['responseType'] = 'id4me';
 
 				// The user is successfully logged in. Run the after login events
@@ -618,22 +616,20 @@ class PlgSystemId4me extends CMSPlugin
 	 */
 	public function onAjaxID4MeVerification()
 	{
-		$code = $this->app->input->get('code');
+		$code  = $this->app->input->get('code');
 		$state = $this->app->input->get('state');
 
-		$client = $this->app->getUserState('id4me.clientInfo');
+		$client       = $this->app->getUserState('id4me.clientInfo');
 		$openIdConfig = $this->app->getUserState('id4me.openIdConfig');
-		$identifier = $this->app->getUserState('id4me.identifier');
+		$identifier   = $this->app->getUserState('id4me.identifier');
 
 		// Prevent __PHP_Incomplete_Class
-		$client = unserialize(serialize($client));
+		$client       = unserialize(serialize($client));
 		$openIdConfig = unserialize(serialize($openIdConfig));
 
 		$authorizedAccessTokens = $this->ID4MeHandler()->getAuthorizationTokens($openIdConfig, $code, $client);
-
-		$decodedToken = $authorizedAccessTokens->getIdTokenDecoded();
-
-		$home = $this->app->getMenu()->getDefault();
+		$decodedToken          = $authorizedAccessTokens->getIdTokenDecoded();
+		$home                  = $this->app->getMenu()->getDefault();
 
 		if ($state != $this->app->getUserState('id4me.state') || $decodedToken->getId4meIdentifier() != $identifier)
 		{
@@ -659,7 +655,7 @@ class PlgSystemId4me extends CMSPlugin
 	public function onContentPrepareForm(JForm $form, $data)
 	{
 		// Check for the user edit forms
-		if (!in_array($form->getName(), ['com_admin.profile', 'com_users.user', 'com_users.profile', 'com_users.registration']))
+		if (!in_array($form->getName(), $this->supportedContext))
 		{
 			return true;
 		}
@@ -786,22 +782,23 @@ class PlgSystemId4me extends CMSPlugin
 	 */
 	public function onUserAfterSave($data, $isNew, $result, $error)
 	{
-		$user_id     = ArrayHelper::getValue($data, 'id', 0, 'int');
+		$userId     = ArrayHelper::getValue($data, 'id', 0, 'int');
 		$identifier  = ArrayHelper::getValue($data, 'id4me_identifier');
 		$issuersub   = ArrayHelper::getValue($data, 'id4me_issuersub');
 
-		$this->deleteID4ME($user_id);
+		// Remove the current id4me mapping
+		$this->deleteID4Me($userId);
 
 		$entry1 = new stdClass;
 
-		$entry1->user_id = (int) $user_id;
+		$entry1->user_id = (int) $userId;
 		$entry1->profile_key = 'id4me.identifier';
 		$entry1->profile_value = $identifier;
 		$entry1->ordering = 1;
 
 		$entry2 = new stdClass;
 
-		$entry2->user_id = (int) $user_id;
+		$entry2->user_id = (int) $userId;
 		$entry2->profile_key = 'id4me.issuersub';
 		$entry2->profile_value = $issuersub;
 		$entry2->ordering = 1;
@@ -839,11 +836,11 @@ class PlgSystemId4me extends CMSPlugin
 			return false;
 		}
 
-		$user_id = ArrayHelper::getValue($user, 'id', 0, 'int');
+		$userId = ArrayHelper::getValue($user, 'id', 0, 'int');
 
-		if ($user_id)
+		if ($userId)
 		{
-			$this->deleteID4ME($user_id);
+			$this->deleteID4Me($userId);
 		}
 
 		return true;
@@ -852,18 +849,18 @@ class PlgSystemId4me extends CMSPlugin
 	/**
 	 * Deletes all id4me profile fields
 	 *
-	 * @param   int  $user_id  The user ID
+	 * @param   int  $userId  The user ID
 	 *
 	 * @return  boolean  True on success otherwise false
 	 */
-	protected function deleteID4ME($user_id)
+	protected function deleteID4Me($userId)
 	{
 		try
 		{
 			$query = $this->db->getQuery(true)
-					->delete($this->db->quoteName('#__user_profiles'))
-					->where($this->db->quoteName('user_id') . ' = ' . (int) $user_id)
-					->where($this->db->quoteName('profile_key') . ' LIKE ' . $this->db->quote($this->db->escape('id4me.', true) . '%', false));
+				->delete($this->db->quoteName('#__user_profiles'))
+				->where($this->db->quoteName('user_id') . ' = ' . (int) $userId)
+				->where($this->db->quoteName('profile_key') . ' LIKE ' . $this->db->quote($this->db->escape('id4me.', true) . '%', false));
 
 			$this->db->setQuery($query)->execute();
 		}
@@ -887,12 +884,12 @@ class PlgSystemId4me extends CMSPlugin
 	protected function getUserByIdentifier()
 	{
 		$query = $this->db->getQuery(true)
-				->select($this->db->quoteName(['p.user_id']))
-				->from($this->db->quoteName('#__user_profiles', 'p'))
-				->from($this->db->quoteName('#__users', 'u'))
-				->where($this->db->quoteName('u.id') . ' = ' . $this->db->quoteName('p.user_id'))
-				->where($this->db->quoteName('p.profile_value') . ' = ' . $this->db->quote($this->app->getUserState('id4me.identifier')))
-				->where($this->db->quoteName('p.profile_key') . ' = ' . $this->db->quote('id4me.identifier'));
+			->select($this->db->quoteName(['p.user_id']))
+			->from($this->db->quoteName('#__user_profiles', 'p'))
+			->from($this->db->quoteName('#__users', 'u'))
+			->where($this->db->quoteName('u.id') . ' = ' . $this->db->quoteName('p.user_id'))
+			->where($this->db->quoteName('p.profile_value') . ' = ' . $this->db->quote($this->app->getUserState('id4me.identifier')))
+			->where($this->db->quoteName('p.profile_key') . ' = ' . $this->db->quote('id4me.identifier'));
 
 		$this->db->setQuery($query);
 
@@ -919,16 +916,25 @@ class PlgSystemId4me extends CMSPlugin
 		return $this->loadUser($userId);
 	}
 
-	protected function loadUser($user_id)
+	/**
+	 * Load the given userId and add the id4Me Data
+	 *
+	 * @param   integer   $userId   The user ID where we want to load
+	 *
+	 * @return  User      Returns a new User object with the ID4Me data
+	 *
+	 * @since  __DEPLOY_VERSION__
+	 */
+	protected function loadUser($userId)
 	{
-		$user = Factory::getUser($user_id);
+		$user = Factory::getUser($userId);
 
 		$user->id4me_identifier = '';
 		$user->id4me_issuersub = '';
 
 		if (!empty($user->id))
 		{
-			$id4mes = $this->loadID4MeData($user_id);
+			$id4mes = $this->loadID4MeData($userId);
 
 			foreach ($id4mes as $id4me)
 			{
@@ -941,13 +947,22 @@ class PlgSystemId4me extends CMSPlugin
 		return $user;
 	}
 
-	protected function loadID4MeData($user_id)
+	/**
+	 * Load the ID4Me Data from the Database
+	 *
+	 * @param   integer   $userId   The user ID where we want to get the info from
+	 *
+	 * @return  array     The Data from the Database for the given userid
+	 *
+	 * @since  __DEPLOY_VERSION__
+	 */
+	protected function loadID4MeData($userId): array
 	{
 		$query = $this->db->getQuery(true)
-				->select($this->db->quoteName(['profile_value', 'profile_key']))
-				->from($this->db->quoteName('#__user_profiles'))
-				->where($this->db->quoteName('user_id') . ' = ' . (int) $user_id)
-				->where($this->db->quoteName('profile_key') . ' IN(' . implode(',', $this->db->quote(['id4me.identifier', 'id4me.issuersub'])) . ')');
+			->select($this->db->quoteName(['profile_value', 'profile_key']))
+			->from($this->db->quoteName('#__user_profiles'))
+			->where($this->db->quoteName('user_id') . ' = ' . (int) $userId)
+			->where($this->db->quoteName('profile_key') . ' IN(' . implode(',', $this->db->quote(['id4me.identifier', 'id4me.issuersub'])) . ')');
 
 		$this->db->setQuery($query);
 
