@@ -156,7 +156,7 @@ class PlgSystemId4me extends CMSPlugin
 			/**
 			 * Do not add a Id4me login button when are already logged in
 			 */
-			if (!Factory::getApplication()->getIdentity()->guest)
+			if (!$this->app->getIdentity()->guest)
 			{
 				return false;
 			}
@@ -165,7 +165,7 @@ class PlgSystemId4me extends CMSPlugin
 			 * Don't try to show a button if we can't figure out if this is a front- or backend page (it's probably a
 			 * CLI or custom application).
 			 */
-			if (!$app->isClient('administrator') && !$app->isClient('site'))
+			if (!$this->app->isClient('administrator') && !$this->app->isClient('site'))
 			{
 				return false;
 			}
@@ -173,7 +173,7 @@ class PlgSystemId4me extends CMSPlugin
 			/**
 			 * Only display a button on HTML output
 			 */
-			if ($app->getDocument()->getType() != 'html')
+			if ($this->app->getDocument()->getType() != 'html')
 			{
 				return false;
 			}
@@ -231,9 +231,9 @@ class PlgSystemId4me extends CMSPlugin
 			Route::_(
 				str_replace(
 					'{client}',
-					Factory::getApplication()->getName(),
+					$this->app->getName(),
 					self::$formActionLoginUrl
-				) . Factory::getApplication()->getSession()->getToken() . '=1'
+				) . $this->app->getSession()->getToken() . '=1'
 			)
 		);
 
@@ -270,7 +270,7 @@ class PlgSystemId4me extends CMSPlugin
 //		HTMLHelper::_('script', 'plg_system_id4me/id4me.min.js', ['relative' => true]);
 
 		/** @var \Joomla\CMS\WebAsset\WebAssetManager $wa */
-		$wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+		$wa = $this->app->getDocument()->getWebAssetManager();
 
 		if (!$wa->assetExists('style', 'plg_system_id4me.button'))
 		{
@@ -560,7 +560,7 @@ class PlgSystemId4me extends CMSPlugin
 				Factory::$application = CMSApplication::getInstance('administrator');
 			}
 
-			$app = Factory::getApplication();
+			$app = $this->app;
 
 			$dispatcher = new JEventDispatcher;
 
