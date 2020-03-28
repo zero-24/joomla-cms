@@ -224,17 +224,14 @@ class PlgSystemId4me extends CMSPlugin
 		// Unique ID for this button (allows display of multiple modules on the page)
 		$randomId = 'plg_system_id4me-' . UserHelper::genRandomPassword(12) . '-' . UserHelper::genRandomPassword(8);
 
-		// Set up the ajax callback
+		$formActionUri = new Uri(Uri::base() . str_replace('{client}', $this->app->getName(), self::$formActionLoginUrl));
+		$formActionUri->setVar($this->app->getSession()->getToken(), '1');
+
+		// Set up the ajax url
 		$formAction = str_replace(
 			'/administrator/',
 			'/',
-			Route::_(
-				str_replace(
-					'{client}',
-					$this->app->getName(),
-					self::$formActionLoginUrl
-				) . $this->app->getSession()->getToken() . '=1'
-			)
+			Route::_($formActionUri->toString())
 		);
 
 		return [
