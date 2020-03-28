@@ -9,8 +9,6 @@
 
 defined('_JEXEC') or die;
 
-//require_once __DIR__ . '/libraries/vendor/autoload.php';
-
 use Id4me\RP\Model\ClaimRequest;
 use Id4me\RP\Model\ClaimRequestList;
 use Id4me\RP\Model\OpenIdConfig;
