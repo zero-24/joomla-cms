@@ -246,10 +246,10 @@ class PlgSystemId4me extends CMSPlugin
 		return [
 			[
 				'label'      => 'PLG_SYSTEM_ID4ME_LOGIN_LABEL',
-				'formAction' => $formAction,
+				'formaction' => $formAction,
 				'id'         => $randomId,
 				'image'      => 'plg_system_id4me/id4me-start-login.svg',
-				'imageDesc'  => Text::_('PLG_SYSTEM_ID4ME_LOGIN_DESC'),
+				'imagedesc'  => Text::_('PLG_SYSTEM_ID4ME_LOGIN_DESC'),
 				'class'      => 'plg_system_id4me_login_button',
 			],
 		];

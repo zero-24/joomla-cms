@@ -117,7 +117,7 @@ Text::script('JHIDEPASSWORD');
 					<?php if (!empty($button['icon'])): ?>
 						<span class="<?php echo $button['icon'] ?>"></span>
 					<?php elseif (!empty($button['image'])): ?>
-						<?php echo HTMLHelper::_('image', $button['image'], $button['imageDesc'], ['class' => 'icon'], true) ?>
+						<?php echo HTMLHelper::_('image', $button['image'], $button['imagedesc'], ['class' => 'icon'], true) ?>
 					<?php endif; ?>
 					<?php echo Text::_($button['label']) ?>
 				</button>

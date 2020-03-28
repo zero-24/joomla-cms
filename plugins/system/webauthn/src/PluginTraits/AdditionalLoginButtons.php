@@ -152,7 +152,7 @@ trait AdditionalLoginButtons
 				'onclick'   => $onClick,
 				'id'        => $randomId,
 				'image'     => 'plg_system_webauthn/webauthn-black.png',
-				'imageDesc' => Text::_('PLG_SYSTEM_WEBAUTHN_LOGIN_DESC'),
+				'imagedesc' => Text::_('PLG_SYSTEM_WEBAUTHN_LOGIN_DESC'),
 				'class'     => 'plg_system_webauthn_login_button',
 			],
 		];
