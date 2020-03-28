@@ -128,12 +128,14 @@ abstract class AuthenticationHelper
 			{
 				// Force mandatory fields
 				$defaultButtonDefinition = [
-					'label'   => '',
-					'icon'    => '',
-					'image'   => '',
-					'class'   => '',
-					'id'      => '',
-					'onclick' => '',
+					'label'      => '',
+					'icon'       => '',
+					'image'      => '',
+					'imageDesc'  => '',
+					'class'      => '',
+					'id'         => '',
+					'onclick'    => '',
+					'formAction' => '',
 				];
 
 				$button = array_merge($defaultButtonDefinition, $item);
@@ -141,14 +143,14 @@ abstract class AuthenticationHelper
 				// Unset anything that doesn't conform to a button definition
 				foreach (array_keys($button) as $key)
 				{
-					if (!in_array($key, ['label', 'icon', 'image', 'class', 'id', 'onclick']))
+					if (!in_array($key, ['label', 'icon', 'image', 'class', 'id', 'onclick', 'formAction', 'imageDesc']))
 					{
 						unset($button[$key]);
 					}
 				}
 
-				// We need a label and an onclick handler at the bare minimum
-				if (empty($button['label']) || empty($button['onclick']) || empty($button['id']))
+				// We need a label and an onclick or formaction handler at the bare minimum
+				if (empty($button['label']) || (empty($button['onclick']) && empty($button['formAction'])) || empty($button['id']))
 				{
 					continue;
 				}
