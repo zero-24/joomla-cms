@@ -25,6 +25,7 @@ use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\User\User;
 use Joomla\CMS\User\UserHelper;
+use Joomla\Session\Storage as SessionStorage;
 use Joomla\Database\ParameterType;
 use Joomla\Registry\Registry;
 use Joomla\Utilities\ArrayHelper;
@@ -1422,7 +1423,7 @@ class UserModel extends AdminModel
 		$db->setQuery($query);
 
 		$sessionIds = $db->loadColumn();
-		$currentSessionId = JFactory::getSession()->getId();
+		$currentSessionId = Factory::getSession()->getId();
 
 		foreach ($sessionIds as $sessionId)
 		{
@@ -1432,7 +1433,7 @@ class UserModel extends AdminModel
 			}
 
 			// Run the destroy step for the session storage ID.
-			JSessionStorage::getInstance()->destroy($sessionId);
+			SessionStorage::getInstance()->destroy($sessionId);
 		}
 	}
 }
