@@ -8,11 +8,10 @@
  */
 
 // Protect from unauthorized access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\Event\DispatcherInterface;
-use Joomla\Plugin\System\Webauthn\Helper\Joomla;
 use Joomla\Plugin\System\Webauthn\PluginTraits\AdditionalLoginButtons;
 use Joomla\Plugin\System\Webauthn\PluginTraits\AjaxHandler;
 use Joomla\Plugin\System\Webauthn\PluginTraits\AjaxHandlerChallenge;

@@ -10,7 +10,7 @@
 namespace Joomla\Plugin\System\Webauthn\PluginTraits;
 
 // Protect from unauthorized access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 use Exception;
 use Joomla\CMS\Factory;
@@ -18,7 +18,6 @@ use Joomla\CMS\Helper\AuthenticationHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\User\UserHelper;
-use Joomla\Plugin\System\Webauthn\Helper\Joomla;
 
 /**
  * Inserts Webauthn buttons into login modules

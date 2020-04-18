@@ -10,13 +10,13 @@
 namespace Joomla\Plugin\System\Webauthn\Field;
 
 // Protect from unauthorized access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\FormField;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\FileLayout;
 use Joomla\CMS\User\UserFactoryInterface;
 use Joomla\Plugin\System\Webauthn\CredentialRepository;
-use Joomla\Plugin\System\Webauthn\Helper\Joomla;
 
 /**
  * Custom Joomla Form Field to display the WebAuthn interface

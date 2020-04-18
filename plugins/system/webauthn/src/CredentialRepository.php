@@ -10,7 +10,7 @@
 namespace Joomla\Plugin\System\Webauthn;
 
 // Protect from unauthorized access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 use Exception;
 use InvalidArgumentException;
@@ -18,7 +18,6 @@ use Joomla\CMS\Encrypt\Aes;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\Database\DatabaseDriver;
-use Joomla\Plugin\System\Webauthn\Helper\Joomla;
 use Joomla\Registry\Registry;
 use JsonException;
 use RuntimeException;
@@ -182,7 +181,7 @@ class CredentialRepository implements PublicKeyCredentialSourceRepository
 		$o            = (object) [
 			'id'         => $credentialId,
 			'user_id'    => $this->getHandleFromUserId($user->id),
-			'label'      => Text::sprintf('PLG_SYSTEM_WEBAUTHN_LBL_DEFAULT_AUTHENTICATOR_LABEL', Joomla::formatDate('now')),
+			'label'      => Text::sprintf('PLG_SYSTEM_WEBAUTHN_LBL_DEFAULT_AUTHENTICATOR_LABEL', $this->formatDate('now')),
 			'credential' => json_encode($publicKeyCredentialSource),
 		];
 		$update = false;
@@ -243,6 +242,82 @@ class CredentialRepository implements PublicKeyCredentialSourceRepository
 		}
 
 		$db->insertObject('#__webauthn_credentials', $o);
+	}
+
+	/**
+	 * Format a date for display.
+	 *
+	 * The $tzAware parameter defines whether the formatted date will be timezone-aware. If set to
+	 * false the formatted date will be rendered in the UTC timezone. If set to true the code will
+	 * automatically try to use the logged in user's timezone or, if none is set, the site's
+	 * default timezone (Server Timezone). If set to a positive integer the same thing will happen
+	 * but for the specified user ID instead of the currently logged in user.
+	 *
+	 * @param   string|DateTime  $date      The date to format
+	 * @param   string           $format    The format string, default is Joomla's DATE_FORMAT_LC6
+	 *                                      (usually "Y-m-d H:i:s")
+	 * @param   bool|int         $tzAware   Should the format be timezone aware? See notes above.
+	 *
+	 * @return  string
+	 *
+	 * @since   4.0.0
+	 */
+	private function formatDate($date, ?string $format = null, bool $tzAware = true): string
+	{
+		$utcTimeZone = new DateTimeZone('UTC');
+		$jDate       = new Date($date, $utcTimeZone);
+
+		// Which timezone should I use?
+		$tz = null;
+
+		if ($tzAware !== false)
+		{
+			$userId = is_bool($tzAware) ? null : (int) $tzAware;
+
+			try
+			{
+				/** @var CMSApplication $app */
+				$app       = Factory::getApplication();
+				$tzDefault = $app->get('offset');
+			}
+			catch (Exception $e)
+			{
+				$tzDefault = 'GMT';
+			}
+
+			/** @var User $user */
+			if (empty($userId))
+			{
+				$user = $app->getIdentity();
+			}
+			else
+			{
+				$user = Factory::getContainer()->get(UserFactoryInterface::class)->loadUserById($userId);
+			}
+
+			$tz   = $user->getParam('timezone', $tzDefault);
+		}
+
+		if (!empty($tz))
+		{
+			try
+			{
+				$userTimeZone = new DateTimeZone($tz);
+
+				$jDate->setTimezone($userTimeZone);
+			}
+			catch (Exception $e)
+			{
+				// Nothing. Fall back to UTC.
+			}
+		}
+
+		if (empty($format))
+		{
+			$format = Text::_('DATE_FORMAT_LC6');
+		}
+
+		return $jDate->format($format, true);
 	}
 
 	/**

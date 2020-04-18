@@ -16,7 +16,6 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\User\User;
 use Joomla\CMS\User\UserHelper;
 use Joomla\Plugin\System\Webauthn\Helper\CredentialsCreation;
-use Joomla\Plugin\System\Webauthn\Helper\Joomla;
 
 /**
  * Passwordless Login management interface
@@ -68,7 +67,7 @@ extract(array_merge($defaultDisplayData, $displayData));
 $randomId    = 'plg_system_webauthn_' . UserHelper::genRandomPassword(32);
 // phpcs:ignore
 $publicKey   = $allow_add ? base64_encode(CredentialsCreation::createPublicKey($user)) : '{}';
-$postbackURL = base64_encode(rtrim(Uri::base(), '/') . '/index.php?' . Joomla::getToken() . '=1');
+$postbackURL = base64_encode(rtrim(Uri::base(), '/') . '/index.php?' . Factory::getApplication()->getSession()->getToken() . '=1');
 ?>
 <div class="plg_system_webauthn" id="plg_system_webauthn-management-interface">
 	<span id="<?php echo $randomId ?>"

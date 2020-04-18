@@ -10,16 +10,16 @@
 namespace Joomla\Plugin\System\Webauthn\PluginTraits;
 
 // Protect from unauthorized access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 use Exception;
 use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\FileLayout;
 use Joomla\CMS\User\UserFactoryInterface;
 use Joomla\Plugin\System\Webauthn\CredentialRepository;
 use Joomla\Plugin\System\Webauthn\Helper\CredentialsCreation;
-use Joomla\Plugin\System\Webauthn\Helper\Joomla;
 use RuntimeException;
 use Webauthn\PublicKeyCredentialSource;
 

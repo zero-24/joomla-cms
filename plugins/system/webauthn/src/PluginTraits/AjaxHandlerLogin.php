@@ -10,7 +10,7 @@
 namespace Joomla\Plugin\System\Webauthn\PluginTraits;
 
 // Protect from unauthorized access
-defined('_JEXEC') or die();
+defined('_JEXEC') or die;
 
 use CBOR\Decoder;
 use CBOR\OtherObject\OtherObjectManager;
@@ -28,7 +28,6 @@ use Joomla\CMS\Log\Log;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\User\UserFactoryInterface;
 use Joomla\Plugin\System\Webauthn\CredentialRepository;
-use Joomla\Plugin\System\Webauthn\Helper\Joomla;
 use Laminas\Diactoros\ServerRequestFactory;
 use RuntimeException;
 use Throwable;
