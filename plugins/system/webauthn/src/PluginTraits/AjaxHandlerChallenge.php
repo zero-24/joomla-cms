@@ -59,7 +59,7 @@ trait AjaxHandlerChallenge
 		// Retrieve data from the request
 		$username  = $input->getUsername('username', '');
 		$returnUrl = base64_encode(
-			Joomla::getSessionVar('returnUrl', Uri::current(), 'plg_system_webauthn')
+			Factory::getApplication()->getSession()->get('plg_system_webauthn.returnUrl', Uri::current())
 		);
 		$returnUrl = $input->getBase64('returnUrl', $returnUrl);
 		$returnUrl = base64_decode($returnUrl);
@@ -71,7 +71,7 @@ trait AjaxHandlerChallenge
 			$returnUrl = Uri::base();
 		}
 
-		Joomla::setSessionVar('returnUrl', $returnUrl, 'plg_system_webauthn');
+		Factory::getApplication()->getSession()->set('plg_system_webauthn.returnUrl', $returnUrl);
 
 		// Do I have a username?
 		if (empty($username))
@@ -142,17 +142,15 @@ trait AjaxHandlerChallenge
 		);
 
 		// Save in session. This is used during the verification stage to prevent replay attacks.
-		Joomla::setSessionVar(
-			'publicKeyCredentialRequestOptions',
-			base64_encode(serialize($publicKeyCredentialRequestOptions)),
-			'plg_system_webauthn'
+		Factory::getApplication()->getSession()->set(
+			'plg_system_webauthn.publicKeyCredentialRequestOptions',
+			base64_encode(serialize($publicKeyCredentialRequestOptions))
 		);
-		Joomla::setSessionVar(
-			'userHandle',
-			$repository->getHandleFromUserId($userId),
-			'plg_system_webauthn'
+		Factory::getApplication()->getSession()->set(
+			'plg_system_webauthn.userHandle',
+			$repository->getHandleFromUserId($userId)
 		);
-		Joomla::setSessionVar('userId', $userId, 'plg_system_webauthn');
+		Factory::getApplication()->getSession()->set('plg_system_webauthn.userId', $userId);
 
 		// Return the JSON encoded data to the caller
 		return json_encode(

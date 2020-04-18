@@ -51,7 +51,7 @@ trait UserDeletion
 
 		if ($userId)
 		{
-			Joomla::log('system', "Removing WebAuthn Passwordless Login information for deleted user #{$userId}");
+			// Removing WebAuthn Passwordless Login information for deleted user #{$userId}
 
 			/** @var DatabaseDriver $db */
 			$db = Factory::getContainer()->get('DatabaseDriver');

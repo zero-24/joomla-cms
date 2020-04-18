@@ -151,11 +151,14 @@ abstract class CredentialsCreation
 		);
 
 		// Save data in the session
-		Joomla::setSessionVar('publicKeyCredentialCreationOptions',
-			base64_encode(serialize($publicKeyCredentialCreationOptions)),
-			'plg_system_webauthn'
+		Factory::getApplication()->getSession()->set(
+			'plg_system_webauthn.publicKeyCredentialCreationOptions',
+			base64_encode(serialize($publicKeyCredentialCreationOptions))
 		);
-		Joomla::setSessionVar('registration_user_id', $user->id, 'plg_system_webauthn');
+		Factory::getApplication()->getSession()->set(
+			'plg_system_webauthn.registration_user_id',
+			$user->id
+		);
 
 		return json_encode($publicKeyCredentialCreationOptions, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 	}
@@ -175,7 +178,7 @@ abstract class CredentialsCreation
 	public static function validateAuthenticationData(string $data): ?PublicKeyCredentialSource
 	{
 		// Retrieve the PublicKeyCredentialCreationOptions object created earlier and perform sanity checks
-		$encodedOptions = Joomla::getSessionVar('publicKeyCredentialCreationOptions', null, 'plg_system_webauthn');
+		$encodedOptions = Factory::getApplication()->getSession()->get('plg_system_webauthn.publicKeyCredentialCreationOptions', null);
 
 		if (empty($encodedOptions))
 		{
@@ -197,7 +200,7 @@ abstract class CredentialsCreation
 		}
 
 		// Retrieve the stored user ID and make sure it's the same one in the request.
-		$storedUserId = Joomla::getSessionVar('registration_user_id', 0, 'plg_system_webauthn');
+		$storedUserId = Factory::getApplication()->getSession()->get('plg_system_webauthn.registration_user_id', 0);
 
 		try
 		{

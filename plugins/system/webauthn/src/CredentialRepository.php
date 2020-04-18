@@ -209,13 +209,11 @@ class CredentialRepository implements PublicKeyCredentialSourceRepository
 			 * Sanity check. The existing credential source must have the same user handle as the one I am trying to
 			 * save. Otherwise something fishy is going on.
 			 */
-			// phpcs:ignore
 			if ($oldRecord->user_id != $publicKeyCredentialSource->getUserHandle())
 			{
 				throw new RuntimeException(Text::_('PLG_SYSTEM_WEBAUTHN_ERR_CREDENTIAL_ID_ALREADY_IN_USE'));
 			}
 
-			// phpcs:ignore
 			$o->user_id = $oldRecord->user_id;
 			$o->label   = $oldRecord->label;
 			$update     = true;

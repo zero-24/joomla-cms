@@ -72,8 +72,5 @@ class PlgSystemWebauthn extends CMSPlugin
 		 * destroyed on application initialization. As a result we need to call loadLanguage() in each method
 		 * individually, even though all methods make use of language strings.
 		 */
-
-		// Register a debug log file writer
-		Joomla::addLogger('system');
 	}
 }

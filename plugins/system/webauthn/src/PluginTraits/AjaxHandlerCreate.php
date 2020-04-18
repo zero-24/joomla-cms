@@ -55,7 +55,7 @@ trait AjaxHandlerCreate
 		 * someone else's Webauthn configuration thus mitigating a major privacy and security risk. So, please, DO NOT
 		 * remove this sanity check!
 		 */
-		$storedUserId = Joomla::getSessionVar('registration_user_id', 0, 'plg_system_webauthn');
+		$storedUserId = Factory::getApplication()->getSession()->get('plg_system_webauthn.registration_user_id', 0);
 		$thatUser     = empty($storedUserId) ?
 			Factory::getApplication()->getIdentity() :
 			Factory::getContainer()->get(UserFactoryInterface::class)->loadUserById($storedUserId);
@@ -64,8 +64,8 @@ trait AjaxHandlerCreate
 		if ($thatUser->guest || ($thatUser->id != $myUser->id))
 		{
 			// Unset the session variables used for registering authenticators (security precaution).
-			Joomla::unsetSessionVar('registration_user_id', 'plg_system_webauthn');
-			Joomla::unsetSessionVar('publicKeyCredentialCreationOptions', 'plg_system_webauthn');
+			Factory::getApplication()->getSession()->set('plg_system_webauthn.registration_user_id', null);
+			Factory::getApplication()->getSession()->set('plg_system_webauthn.publicKeyCredentialCreationOptions', null);
 
 			// Politely tell the presumed hacker trying to abuse this callback to go away.
 			throw new RuntimeException(Text::_('PLG_SYSTEM_WEBAUTHN_ERR_CREATE_INVALID_USER'));
@@ -100,8 +100,8 @@ trait AjaxHandlerCreate
 		}
 
 		// Unset the session variables used for registering authenticators (security precaution).
-		Joomla::unsetSessionVar('registration_user_id', 'plg_system_webauthn');
-		Joomla::unsetSessionVar('publicKeyCredentialCreationOptions', 'plg_system_webauthn');
+		Factory::getApplication()->getSession()->set('plg_system_webauthn.registration_user_id', null);
+		Factory::getApplication()->getSession()->set('plg_system_webauthn.publicKeyCredentialCreationOptions', null);
 
 		// Render the GUI and return it
 		$layoutParameters = [
@@ -115,6 +115,8 @@ trait AjaxHandlerCreate
 			$layoutParameters['error'] = $error;
 		}
 
-		return Joomla::renderLayout('plugins.system.webauthn.manage', $layoutParameters);
+		$layout = new FileLayout('plugins.system.webauthn.manage', JPATH_SITE . '/plugins/system/webauthn/layout');
+
+		return $layout->render($layoutParameters);
 	}
 }

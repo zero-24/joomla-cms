@@ -77,7 +77,7 @@ trait AdditionalLoginButtons
 			 */
 			try
 			{
-				Joomla::isAdminPage();
+				Factory::getApplication()->isClient('administrator');
 			}
 			catch (Exception $e)
 			{
@@ -87,7 +87,7 @@ trait AdditionalLoginButtons
 			/**
 			 * Only display a button on HTML output
 			 */
-			if (Joomla::getDocumentType() != 'html')
+			if (Factory::getApplication()->getDocument()->getType() !== 'html')
 			{
 				return false;
 			}
@@ -137,7 +137,7 @@ trait AdditionalLoginButtons
 
 		// Return URL
 		$uri = new Uri(Uri::base() . 'index.php');
-		$uri->setVar(Joomla::getToken(), '1');
+		$uri->setVar(Factory::getApplication()->getSession()->getToken(), '1');
 
 		// Unique ID for this button (allows display of multiple modules on the page)
 		$randomId = 'plg_system_webauthn-' . UserHelper::genRandomPassword(12) . '-' . UserHelper::genRandomPassword(8);
@@ -196,7 +196,10 @@ trait AdditionalLoginButtons
 		Text::script('PLG_SYSTEM_WEBAUTHN_ERR_INVALID_USERNAME');
 
 		// Store the current URL as the default return URL after login (or failure)
-		Joomla::setSessionVar('returnUrl', Uri::current(), 'plg_system_webauthn');
+		Factory::getApplication()->getSession()->set(
+			'plg_system_webauthn.returnUrl',
+			Uri::current()
+		);
 	}
 
 }

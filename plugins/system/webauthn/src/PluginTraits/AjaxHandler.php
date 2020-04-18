@@ -52,12 +52,12 @@ trait AjaxHandler
 		$input = $app->input;
 
 		// Get the return URL from the session
-		$returnURL = Joomla::getSessionVar('returnUrl', Uri::base(), 'plg_system_webauthn');
+		$returnURL = Factory::getApplication()->getSession()->get('plg_system_webauthn.returnUrl', Uri::base());
 		$result = null;
 
 		try
 		{
-			Joomla::log('system', "Received AJAX callback.");
+			//Received AJAX callback
 
 			if (!($app instanceof CMSApplication))
 			{
@@ -66,7 +66,7 @@ trait AjaxHandler
 
 			$input    = $app->input;
 			$akaction = $input->getCmd('akaction');
-			$token    = Joomla::getToken();
+			$token    = Factory::getApplication()->getSession()->getToken();
 
 			if ($input->getInt($token, 0) != 1)
 			{
@@ -99,14 +99,14 @@ trait AjaxHandler
 		}
 		catch (AjaxNonCmsAppException $e)
 		{
-			Joomla::log('system', "This is not a CMS application", Log::NOTICE);
+			//This is not a CMS application", Log::NOTICE);
 
 			$result = null;
 		}
 		catch (Exception $e)
 		{
-			Joomla::log('system', "Callback failure, redirecting to $returnURL.");
-			Joomla::setSessionVar('returnUrl', null, 'plg_system_webauthn');
+			// Callback failure, redirecting to $returnURL
+			Factory::getApplication()->getSession()->set('plg_system_webauthn.returnUrl', null);
 			$app->enqueueMessage($e->getMessage(), 'error');
 			$app->redirect($returnURL);
 
@@ -119,19 +119,19 @@ trait AjaxHandler
 			{
 				default:
 				case 'json':
-					Joomla::log('system', "Callback complete, returning JSON.");
+					// Callback complete, returning JSON
 					echo json_encode($result);
 
 					break;
 
 				case 'jsonhash':
-					Joomla::log('system', "Callback complete, returning JSON inside ### markers.");
+					// Callback complete, returning JSON inside ### markers
 					echo '###' . json_encode($result) . '###';
 
 					break;
 
 				case 'raw':
-					Joomla::log('system', "Callback complete, returning raw response.");
+					// Callback complete, returning raw response
 					echo $result;
 
 					break;
@@ -149,11 +149,11 @@ trait AjaxHandler
 
 					if (isset($result['url']))
 					{
-						Joomla::log('system', "Callback complete, performing redirection to {$result['url']}{$modifiers}.");
+						// Callback complete, performing redirection to {$result['url']}{$modifiers}
 						$app->redirect($result['url']);
 					}
 
-					Joomla::log('system', "Callback complete, performing redirection to {$result}{$modifiers}.");
+					// Callback complete, performing redirection to {$result}{$modifiers}
 					$app->redirect($result);
 
 					return;
@@ -163,8 +163,8 @@ trait AjaxHandler
 			$app->close(200);
 		}
 
-		Joomla::log('system', "Null response from AJAX callback, redirecting to $returnURL");
-		Joomla::setSessionVar('returnUrl', null, 'plg_system_webauthn');
+		// Null response from AJAX callback, redirecting to $returnURL
+		Factory::getApplication()->getSession()->set('plg_system_webauthn.returnUrl', NULL);
 
 		$app->redirect($returnURL);
 	}

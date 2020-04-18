@@ -63,11 +63,12 @@ class WebauthnField extends FormField
 		$app->getDocument()->getWebAssetManager()
 			->registerAndUseScript('plg_system_webauthn.management', 'plg_system_webauthn/management.js', [], ['defer' => true], ['core']);
 
-		return Joomla::renderLayout('plugins.system.webauthn.manage', [
-			'user'        => Factory::getContainer()->get(UserFactoryInterface::class)->loadUserById($userId),
-			'allow_add'   => $userId == $app->getIdentity()->id,
-			'credentials' => $credentialRepository->getAll($userId),
-			]
-		);
+			$layout = new FileLayout('plugins.system.webauthn.manage', JPATH_SITE . '/plugins/system/webauthn/layout');
+
+			return $layout->render([
+				'user'        => Factory::getContainer()->get(UserFactoryInterface::class)->loadUserById($userId),
+				'allow_add'   => $userId == $app->getIdentity()->id,
+				'credentials' => $credentialRepository->getAll($userId),
+			]);
 	}
 }
