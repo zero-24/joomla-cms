@@ -1547,9 +1547,12 @@ ENDDATA;
 				? $decode->manifest_cache->author
 				: JText::_('COM_JOOMLAUPDATE_PREUPDATE_UNKNOWN_EXTENSION_MANIFESTCACHE_AUTHOR');
 
-			$plugin->authorUrl = isset($decode->manifest_cache->authorUrl)
-				? $decode->manifest_cache->authorUrl
-				: JText::_('COM_JOOMLAUPDATE_PREUPDATE_UNKNOWN_EXTENSION_MANIFESTCACHE_AUTHORURL');
+			$plugin->authorUrl = $decode->manifest_cache->authorUrl;
+
+			if (!isset($plugin->authorUrl))
+			{
+				unset($plugin->authorUrl);
+			}
 		}
 
 		return $rows;
