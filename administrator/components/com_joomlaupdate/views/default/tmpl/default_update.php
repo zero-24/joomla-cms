@@ -186,8 +186,8 @@ defined('_JEXEC') or die;
 									<td/>
 								<?php endif; ?>
 								<td>
-									<?php if (isset($nonCoreCriticalPlugin->manifest_cache->author)) : ?>
-									<?php echo JText::_($nonCoreCriticalPlugin->manifest_cache->author); ?>
+									<?php if (isset($nonCoreCriticalPlugin->author)) : ?>
+									<?php echo JText::_($nonCoreCriticalPlugin->author); ?>
 									<?php elseif ($nonCoreCriticalPlugin->package_id > 0) : ?>
 									<?php foreach ($this->nonCoreExtensions as $nonCoreExtension) : ?>
 										<?php if ($nonCoreCriticalPlugin->package_id == $nonCoreExtension->extension_id) : ?>
@@ -200,8 +200,8 @@ defined('_JEXEC') or die;
 								</td>
 								<td>
 									<?php $authorURL = ''; ?>
-									<?php if (isset($nonCoreCriticalPlugin->manifest_cache->authorUrl)) : ?>
-										<?php $authorURL = $nonCoreCriticalPlugin->manifest_cache->authorUrl; ?>
+									<?php if (isset($nonCoreCriticalPlugin->authorUrl)) : ?>
+										<?php $authorURL = $nonCoreCriticalPlugin->authorUrl; ?>
 									<?php elseif ($nonCoreCriticalPlugin->package_id > 0) : ?>
 										<?php foreach ($this->nonCoreExtensions as $nonCoreExtension) : ?>
 											<?php if ($nonCoreCriticalPlugin->package_id == $nonCoreExtension->extension_id) : ?>

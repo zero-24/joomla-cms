@@ -1535,12 +1535,21 @@ ENDDATA;
 		foreach ($rows as $plugin)
 		{
 			$decode = json_decode($plugin->manifest_cache);
+			unset($plugin->manifest_cache);
+
 			$this->translateExtensionName($plugin);
+
 			$plugin->version = isset($decode->version)
 				? $decode->version
 				: JText::_('COM_JOOMLAUPDATE_PREUPDATE_UNKNOWN_EXTENSION_MANIFESTCACHE_VERSION');
-			unset($plugin->manifest_cache);
-			$plugin->manifest_cache = $decode;
+
+			$plugin->author = isset($decode->manifest_cache->author)
+				? $decode->manifest_cache->author
+				: JText::_('COM_JOOMLAUPDATE_PREUPDATE_UNKNOWN_EXTENSION_MANIFESTCACHE_AUTHOR');
+
+			$plugin->authorUrl = isset($decode->manifest_cache->authorUrl)
+				? $decode->manifest_cache->authorUrl
+				: JText::_('COM_JOOMLAUPDATE_PREUPDATE_UNKNOWN_EXTENSION_MANIFESTCACHE_AUTHORURL');
 		}
 
 		return $rows;
