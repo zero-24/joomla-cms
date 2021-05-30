@@ -65,7 +65,7 @@ $fullpath = $tmp . '/' . $time;
 // Parse input options
 $options = getopt('', ['help', 'remote::', 'exclude-zip', 'exclude-gzip', 'exclude-bzip2']);
 
-$remote       = $options['remote'] ?? false;
+$remote       = isset($options['remote']) ? $options['remote'] : false;
 $excludeZip   = isset($options['exclude-zip']);
 $excludeGzip  = isset($options['exclude-gzip']);
 $excludeBzip2 = isset($options['exclude-bzip2']);
